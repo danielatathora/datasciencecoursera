@@ -1,0 +1,381 @@
+coursera Data Analytics
+
+#####################################################
+## 3 Plotting Systems 
+#####################################################
+
+
+#####################################################
+##
+## 1. BASIC
+##
+#####################################################
+
+# Basic plotting functions were covered in week 1 notes and week1_resion.R
+
+
+
+
+#####################################################
+##
+## 2. LATTICE
+##
+#####################################################
+
+Pros:
+  - Plots are created with a single function call( xyplot, bwplot, etc.)
+  - Most useful for conditioning types of plots: Looking at how y changes with x across levels of z
+  - Things like margins/spacing set automatically becuase entire plot is specified at once
+  - Good for putting may many plots on the screen
+
+Cons:
+  - Sometimes awkward to specify an entire plot in a single function allow
+  - Annotation is plot is not especiallu intuitive
+  - Use of panel functions and subscrips is difficult to wierd and requireds intense preperation
+  Cannot "Add" to a plot once it is created.
+
+
+
+
+# Lattice
+    xyplot() ** most important for screating scatterplots
+    bwplot() box-and-whiskers plots ("boxplots")
+    histogram() histogram
+    stripplot() like a boxplot but with actual points
+    dotplot() plts dots on violin strings
+    splom() scatterplot matrix
+    levelplot, contourplot  for plottingi mages
+    xyplot(y ~ x | f * g, data)
+    f ang are categorica variables that you apply a condition on
+
+    underlying the lattice is the grid package (lattace is built on top of grid)
+    
+  ** Plot is a single funciton call you cant add to it
+    #---------------------
+    # example: multi panels - powerful
+    library(lattice)
+    state <- data.frame(state.x77, region = state.region)
+    xyplot(Life.Exp ~ Income | region, data = state, layout = c(4,1))
+    #---------------------
+
+    #---------------------
+    example: simple
+    library(lattice)
+    library(datasets)
+    ## Simple scatterplot
+    xyplot(Ozone ~ Wind, data = airquality)
+
+    #--------------------
+
+    example: mode complex
+    library(lattice)
+    library(datasets)
+    ## Convert 'Month' to a factor variable
+    xyplot(Ozone ~ Wind | Month, data = airquality, layout = c(5, 1))
+    #---------------------
+
+
+
+  ** object of type trellis **
+
+  Lattice graphics functions dont write to the grphics device directly
+  they instead return an object of type 'trellis'
+  
+  the print method send the plot to the graphics device
+  the auto print happens automatically when you dont assign the output
+
+# example
+p <- xyplot(Ozone ~ Wind, data = airquality) # nothing is printed
+print(p)  # now the plot happens
+
+xyplot(Ozone ~ Wind, data = airquality) # auto-printing
+
+# lattice functions have a panel function that controls what 
+ happens inside each panel of the plot.
+
+ ## Lattice Panel functions
+set.seed(10)
+x <- rnorm(100)
+f <- rep(0:1, each = 50)
+y <- x + f - f * x + rnorm(100, sd = 0.5)
+f <- factor(f, labels = c("Group 1", "Group 2"))
+xyplot(y ~ x | f, layout = c(2, 1)) ## Plot with 2 panels
+
+## custom panel function
+xyplot(y ~ x | f, panel = function(x, y, ...) {
+  panel.xyplot(x, y, ...) ## First call the default panel function for 'xyploy'
+  panel.abline(h = median(y), lty = 2)  ## Add a horizonal line at the median
+})
+
+## custom panel function - with regular regression line
+xyplot(y ~ x | f, panel = function(x, y, ...) {
+  panel.xyplot(x, y, ...) ## First call the default panel function for 'xyplot'
+  panel.lmline(x, y, col 2)  ## Overley a simple linear regression line
+})
+
+
+
+#####################################################
+##
+## 3. GGPLOT2
+##
+#####################################################
+
+Has a grammer "The Grammer of Graphics"
+
+Like, Lattice it's build on top of the Grid package
+
+most basic is hte qplot()    - quick plot
+
+generally expects the data to be in a dataframe
+
+Note:
+  - Splits the difference between base and lattice in a numer of ways
+  - Automatically deals with spacing, text, titles but also allow you to annotate by "adding" to the plot
+  - Superficial similarity to lattice but generally easier/mode intuitive to use
+  - Default mode make many choices for you (but you can still customize to your heart's deire)
+
+
+plots are made up of 
+aesthetics(size, shape, color) 
+  and 
+geoms(points, lines)
+
+Factors are importand they indicate subsete of the data in
+the dataframe
+
+## so in summary ######################################
+## [A Data Frame]
+## [aestetic mapping]: how data are mapped ro color, size
+## [goems]: geomeytic objects like points, lines, shapres.
+## [facets]: for conditional plots (usually multiple panels).
+## [stats]: statistical transformations like binnin, quantiles, smoothing
+## [scales]: what scale an aestetic map uses (example: male = red, female = blue).
+## [coordinate system]
+#######################################################
+
+ggplot() is the core function and can do things qplot() cannot
+
+# library("ggplot2") or library(ggplot2)
+
+#=======================================================
+# sample
+library(ggplot2)
+data(mpg)
+qplot(displ, hwy, data = mpg)
+#=======================================================
+
+# get hepl on qplot
+? qplot
+
+names(mpg)
+
+#######################
+# qplot()
+#######################
+
+# most basic is qplot()
+# example 1
+qplot(mpg, wt, data = mtcars)
+
+
+# example 2 "Hello World"
+
+# qplot(x-coord, y-coord, dataframe)
+  qplot(displ,   hwy,     data = mpg)
+
+
+# example 3 "Hello World"
+
+# qplot(x-coord, y-coord, dataframe)
+  qplot(displ,   hwy,     data = mpg)
+
+  # modifying aesthetics
+  qplot(displ,   hwy,     data = mpg, color = drv)
+
+# adding a statistic
+qplot(displ, hwy, data = mpg, geom = c("point", "smooth"))
+
+# histogram using qplot()
+qplot(hwy, data = mpg, fill = drv)
+
+
+# facets (split data into seporate groups when there are many points and colour alone is not the best option)
+
+# one row , many columns . ~ drv
+qplot(displ, hwy, data = mpg, facets = . ~ drv )
+
+# many rows, one olumn  drv ~ .
+qplot(hwy, data = mpg, facets = drv ~ ., binwidth = 2 )
+
+# maacs example (data is not available so just some sample code here
+qplot(log(eno), data = maacs)
+
+qplot(log(eno), data = maacs, fill = mopos) # add colour (fill)
+
+qplot(log(eno), data = maacs, geom ="density") # density plot
+qplot(log(eno), data = maacs, geom ="density", color = mopos) # density plot, split out by color
+
+qplot(log(pm25), log(eno), data = maacs) # scatter plot (hard to decifer)
+qplot(log(pm25), log(eno), data = maacs, shape = mopos) # scatter plot dots and trianles (hard to decifer)
+qplot(log(pm25), log(eno), data = maacs, color = mopos) # scatter plot color - easier to decifer
+
+## smooth  (lm is a standard linier regression model)
+qplot(log(pm25), log(eno), data = maacs, color = mopos) + geom_smooth(method = "lm")
+
+# split into two columns . ~ mopos
+qplot(log(pm25), log(eno), data = maacs, facets = . ~ mopos) + geom_smooth(method = "lm")
+
+
+# maacs download from net (maacs_env) may be incmploete
+load("maacs.Rda")  # will creat an object named maacs
+head(maacs)
+summary(maacs)
+maacs$logpm25
+
+
+qplot(logpm25, NocturnalSympt, data = maacs, facets = . ~ bmicat
+      ,geom = c("point", "smooth"), method = "lm")
+
+
+
+#
+# [Video part 4]
+#
+
+
+head(maacs[, 1:3])
+
+g <- ggplot(maacs, aes(logpm25, NocturnalSympt))
+
+summary(g) # get a summary on a ggplot object
+
+print(g) # won't plot anything as we have no layers
+
+p <- g + geom_point()  # adding layer (with default)
+
+print(p) # now we see the plot
+
+
+####################
+# Adding more layers
+####################
+
+# adding more layers : smooth
+
+g + geom_point() + geom_smooth()
+
+g + geom_point() +  geom_smooth(method = "lm")
+
+# adding more  layers : facets
+
+# ** very cool - produced two panel (Normal Weight and overweight) **
+g + geom_point() + facet_grid( . ~ bmicat) + geom_smooth(method = "lm")
+
+# you can add layers in any order
+
+# if the (meta) data is named correcly (meaningful columns names)
+# it makes the plot easier as you can allow ggplot to use the default
+# column names
+
+
+#
+# Annotations
+#
+# - Labels: xlab(), ylab(), labs(), ggtitle()
+# - Each of the "geom" functions has optons to modify
+# - For things that only make sense globally, use theme()
+#   - Example: theme(legend.position = "none")
+# - Two standard appearance themes are included
+#   - theme_gray(): The default theme (gray backgroun)
+#   - theme_bm(): More stark/plain
+
+
+#
+# Modifying Aesthetics
+#
+
+g + geom_point(color = "steelblue", size = 4, alpha = 1/2)  
+
+g + geom_point(aes(color = bmicat), size = 4, alpha = 1/2) 
+
+# if you want to set an aestetic to a variable - wrap it in the aes() function
+
+# adding labels
+
+g + geom_point(aes(color = bmicat)) + labs(title = "MAACS Cohort") + labs(x = expression("log " * PM[2.5]), y = "Nocturnal Symtoms")
+
+# modify the smoother
+g + geom_point(aes(color = bmicat), size = 2, alpha = 1/2) +
+  geom_smooth(size = 4, linetype = 3, method = "lm", se = FALSE)
+
+
+#
+# Changing the theme
+#
+
+g + geom_point(aes(color = bmicat)) + theme_bw(base_family = "Times")
+
+
+
+#
+# [Video part 5]
+#
+
+#
+# A Note aout Axis Limits
+#
+
+# generate some data with an outlier
+testdat <- data.frame(x = 1:100, y = rnorm(100))
+testdat[50,2] <- 100 ## Stick in an Outlier! sure why not
+
+# base system
+plot(testdat$x, testdat$y, type = "l", ymil = c(-3, 3))
+
+# ggplot ststem
+g <- ggplot(testdat, aes(x = x, y = y))
+g + geom_line()
+
+
+# to exclude ot include the outlier
+
+g + geom_line() + ylim(-3, 3) # Outlier missing (gap)
+
+g + geom_line() + coord_cartesian(ylim = c(-3, 3)) # Outlier included (but plot doent resize to facilitate)
+
+
+# More complex problem
+
+# catergorise a continious variables
+
+## Calculate the deciles of the data (length = 4 splits into 0%, 33%, 66% and 100%)
+cutpoints = quantile(maacs$logno2_new, seq(0, 1, length = 4), na.rm = TRUE)
+# cutpoints # test
+
+## Cut the data at the deciles and create a new factor variable (0-1, 1-2, 2-3)
+maacs$no2dec <- cut(maacs$logno2_new, cutpoints)
+
+## See the levels og the newly created factor variable
+levels(maacs$no2dec)
+# [1] "(-0.629,1.18]" "(1.18,1.44]"   "(1.44,2.48]" 
+
+
+# plot a 4 x 2 (8 panels) plot
+
+## Setup ggplot with a data frame
+g <- ggplot(maacs, aes(logpm25, NocturnalSympt))
+
+## Add layers
+g + geom_point(alpha = 1/3) +
+  facet_wrap(bmicat ~ no2dec, nrow = 2, ncol = 4) +
+  geom_smooth(method="lm", se=FALSE, col="steelblue") +
+  theme_bw(base_family = "Avenir", base_size = 10) +
+  labs(x = expression("log " * PM[2.5])) + 
+  labs(y = "Nocturnal Symptoms") +
+  labs(title = "MAACS Cohort")
+
+ 
+
+##########################################
+

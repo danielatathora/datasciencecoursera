@@ -1,0 +1,315 @@
+##
+## &, && (AND Operators)
+##
+
+TRUE & c(TRUE, FALSE, FALSE)
+# TRUE FALSE FALSE
+
+# you can use && to test the first element of a vector
+TRUE && c(TRUE, FALSE, FALSE)
+[1] TRUE
+
+##
+## | , || (Or Operators)
+##
+
+TRUE | c(TRUE, FALSE, FALSE)
+# [1] TRUE TRUE TRUE
+
+# you can use || to test the first element of a vector
+# TRUE || c(TRUE, FALSE, FALSE)
+# [1] TRUE
+
+# | and || , & and && apper to do the same thing here
+5 > 8 || 6 != 8 && 4 > 3.9
+# [1] TRUE
+
+5 > 8 | 6 != 8 & 4 > 3.9
+# [1] TRUE
+
+isTRUE(6 > 4)
+# [1] TRUE
+
+
+identical("twins", "twins")
+# [1] TRUE
+
+# xor
+xor(5 ==6, !FALSE)  # if one side is false and the other is true then true, otherwise false
+# [1] TRUE
+
+
+ints <- sample(10)
+ints
+#  [1]  9  8 10  6  7  5  1  2  3  4
+
+ints > 5
+#  [1]  TRUE  TRUE  TRUE  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE
+
+# produce element of the indices that meet a condition
+
+##
+## which
+##
+which(ints > 7)
+# [1] 1 2 3
+
+
+##
+## any
+##
+any(ints < 0)
+# [1] FALSE
+
+
+##
+## all()
+##
+all(ints > 0)
+# [1] TRUE
+
+
+## 
+## Functions
+##
+
+
+
+my_mean <- function(my_vector) {
+  sum(my_vector)/length(my_vector)
+}
+
+remainder <- function(num, divisor = 2) {
+  num %% divisor
+}
+
+remainder(11, 5)
+# [1] 1
+
+remainder(divisor = 11, num = 5)
+# [1] 5
+
+args(remainder)
+# function (num, divisor = 2) 
+# NULL
+
+
+# passing in a function to a function (like args(func) above)
+
+# evaluate() should act:
+#    1. evaluate(sum, c(2, 4, 6)) should evaluate to 12
+#    2. evaluate(median, c(7, 40, 9)) should evaluate to 9
+#    3.evaluate(median, c(7, 40, 9))should evaluate to 11
+
+evaluate <- function(func, dat){
+  func(dat)
+}
+
+# test the function by passing in a function (sum, median)
+
+evaluate(sum, c(2, 4, 6))
+# [1] 12
+evaluate(median, c(7, 40, 9))
+# [1] 9
+evaluate(median, c(7, 40, 9))
+# [1] 9
+
+
+evaluate(sd, c(1.4, 3.6, 7.9, 8.8))
+#  [1] 3.514138
+
+# anonymous functions
+evaluate(function(x){x+1}, 6)
+# [1] 7
+
+
+# ananymous function to return the first element of a vector
+evaluate(function(x){x[1]}, c(8, 4, 0))
+#  [1] 8
+
+# ananymous function to return the last element of a vector
+evaluate(function(x){x[length(x)]}, c(8, 4, 0))
+# [1] 0
+
+
+telegram <- function(...){
+  paste("START", ... , "STOP")  
+}
+
+mad_libs <- function(...){
+  # Do your argument unpacking here!
+  args <- list(...)
+  place = args[["place"]]
+  adjective = args[["adjective"]]
+  noun = args[["noun"]]
+  
+  # Don't modify any code below this comment.
+  # Notice the variables you'll need to create in order for the code below to
+  # be functional!
+  paste("News from", place, "today where", adjective, "students took to the streets in protest of the new", noun, "being installed on campus.")
+}
+
+
+# *** VERY COOL ***
+
+# define a custom operator
+"%p%" <- function(a, b){ # Remember to add arguments!
+  paste(a, b)
+}
+
+# test it
+"I" %p% "love" %p% 'R!'
+# [1] "I love R!"
+
+
+# Flags dataset
+# http://archive.ics.uci.edu/ml/datasets/Flags
+# swirl() r-Programming lesson 10
+
+
+# apply class to each column of the flags dataset (returns a list)
+ cls_list <- lapply(flags, class)
+
+ cls_list
+# $name
+# [1] "character"
+
+# $landmass
+# [1] "integer"
+
+# $zone
+# [1] "integer"
+
+# ... 
+
+# Confirm it a list
+ class(cls_list)
+# [1] "list"
+
+as.character(cls_list)
+#  [1] "character" "integer"   "integer"   "integer"   "integer"   "integer"   "integer"  
+#  [8] "integer"   "integer"   "integer"   "integer"   "integer"   "integer"   "integer"  
+# [15] "integer"   "integer"   "integer"   "character" "integer"   "integer"   "integer"  
+# [22] "integer"   "integer"   "integer"   "integer"   "integer"   "integer"   "integer"  
+# [29] "character" "character"
+
+cls_vect <- sapply(flags, class)
+
+class(cls_vect)
+# [1] "character"
+
+# sum(flags$orange)
+[1] 26
+
+ flag_colors <- flags[,11:17]
+ 
+ head(flag_colors)
+#   red green blue gold white black orange
+# 1   1     1    0    1     1     1      0
+# 2   1     0    0    1     0     1      0
+# 3   1     1    0    0     1     0      0
+# 4   1     0    1    1     1     0      1
+# 5   1     0    1    1     0     0      0
+# 6   1     0    0    1     0     1      0
+
+
+# aply sum() to each column (lapply returns a list)
+lapply(flag_colors, sum)
+# $red
+# [1] 153
+# 
+# $green
+# [1] 91
+# 
+# $blue
+# [1] 99
+# 
+# $gold
+# [1] 91
+# 
+# $white
+# [1] 146
+# 
+# $black
+# [1] 52
+# 
+# $orange
+# [1] 26
+
+
+# Simplify with sapply (sapply returns a matrix)
+
+sapply(flag_colors, sum)
+#    red  green   blue   gold  white  black orange 
+#    153     91     99     91    146     52     26 
+
+
+# mean
+sapply(flag_colors, mean)
+#       red     green      blue      gold     white     black    orange 
+# 0.7886598 0.4690722 0.5103093 0.4690722 0.7525773 0.2680412 0.1340206 
+
+
+# The range() function returns the minimum and maximum
+
+
+| The range() function returns the minimum and maximum of its first argument, which
+| should be a numeric vector. Use lapply() to apply the range function to each column
+| of flag_shapes. Don't worry about storing the result in a new variable. By now, we
+| know that lapply() always returns a list.
+
+
+lapply(flag_shapes, range)
+# $circles
+# [1] 0 4
+# 
+# $crosses
+# [1] 0 2
+# 
+# $saltires
+# [1] 0 1
+# 
+# $quarters
+# [1] 0 4
+# 
+# $sunstars
+# [1]  0 50
+
+
+
+shape_mat <- sapply(flag_shapes, range)
+#      circles crosses saltires quarters sunstars
+# [1,]       0       0        0        0        0
+# [2,]       4       2        1        4       50
+
+shape_mat
+
+class(shape_mat)
+# [1] "matrix" "array" 
+
+
+lapply(unique_vals, length)
+
+# detailed response
+# ...
+
+
+sapply(unique_vals, length)
+#        name   landmass       zone       area population   language   religion       bars 
+#        194          6          4        136         48         10          8          5 
+#    stripes    colours        red      green       blue       gold      white      black 
+#         12          8          2          2          2          2          2          2 
+#     orange    mainhue    circles    crosses   saltires   quarters   sunstars   crescent 
+#          2          8          4          3          2          3         14          2 
+#   triangle       icon    animate       text    topleft   botright 
+#          2          2          2          2          7          8 
+
+# get second element foreach
+lapply(unique_vals, function(elem) elem[2])
+
+
+#   |==============================================================   |  96%
+# | The only difference between previous examples and this one is that we are defining
+# | and using our own function right in the call to lapply(). Our function has no name
+# | and disappears as soon as lapply() is done using it. So-called 'anonymous functions'
+# | can be very useful when one of R's built-in functions isn't an option.

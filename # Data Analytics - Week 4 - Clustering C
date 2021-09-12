@@ -1,0 +1,266 @@
+# Data Analytics - Week 4 - Clustering Case Study - Review
+
+
+# Plotting average acceleration of for first subject
+
+
+par(mfrow = c(1, 2), mar = c(5, 4, 1, 1))
+samsungData <- transform(samsungData, Activity = factor(Activity))
+sub1 <- subset(samsungData, subject == 1)
+plot(sub1[, 1], col = sub1$Activity, ylab = names(sub1)[1])
+plot(sub1[, 2], col = sub1$Activity, ylab = names(sub1)[2])
+legend("bottomright", legend = unique(sub1$Activity), col = unique(sub1$Activity),
+       pch = 1)
+
+
+
+# load csv
+
+#df <- read.table("SamsungSmartPhone/train.csv", header = TRUE)
+# dim(df)
+
+setwd("/Users/daniel/Documents/Coursera_data_analytics_r_studio_work/Week_4")
+getwd()
+
+samsungData <- read.csv(file = 'SamsungSmartPhone/train.csv')
+# dim(samsungData)
+# [1] 7352  563
+
+names(samsungData[1:12])
+
+table(samsungData$Activity)
+
+
+
+#---------------------------------------------------
+Question:
+Why is the dendrogram produced using the average acceleration features relatively uninformative?
+
+
+Average acceleration is a binary feature and cannot be used by the hclust function.
+
+The average acceleration features do not appear to be able to discriminate between the six different behaviors.
+  (This is the correct answer)
+
+The dendrogram would be more informative if a better color scheme were used to color the terminal nodes.
+
+Correct
+
+#---------------------------------------------------
+
+
+# Plotting average acceleration of for first subject
+
+par(mfrow = c(1, 2), mar = c(5, 4, 1, 1))
+samsungData <- transform(samsungData, Activity = factor(Activity)) ## convert to factor variable
+sub1 <- subset(samsungData, subject == 1)
+plot(sub1[, 1], col = sub1$Activity, ylab = names(sub1)[1])
+plot(sub1[, 2], col = sub1$Activity, ylab = names(sub1)[2])
+legend("bottomright", legend = unique(sub1$Activity), col = unique(sub1$Activity),
+       pch = 1)
+
+
+par(mfrow = c(1, 2))
+plot(sub1[, 1], col = sub1$Activity, ylab = names(sub1)[1])
+plot(sub1[, 2], col = sub1$Activity, ylab = names(sub1)[2])
+
+# Plotting Mac Accelloration for the first saubject
+par(mfrow = c(1, 2))
+plot(sub1[, 10], col = sub1$Activity, ylab = names(sub1)[10])
+plot(sub1[, 11], col = sub1$Activity, ylab = names(sub1)[11])
+
+
+# Single Value Decomposition
+svd1 = svd(scale(sub1[, -c(562, 583)] ))
+par(mfrow = c(1, 2))
+plot(svd1$u[, 1], col = sub1$Activity, pch = 19)
+plot(svd1$u[, 2], col = sub1$Activity, pch = 19)
+
+
+# Find maximum contributor
+plot(svd1$v[, 2], pch = 19)
+
+
+# New clustering with maximum contributer
+par(mfrow = c(1, 1))
+maxContrib <- which.max(svd1$v[, 2])
+distanceMatrix <- dist(sub1[, c(19:12, maxContrib)])
+hClustering <- hclust(distanceMatrix)
+myplclust(hclustering, lab.col = unclass(sub1$Activity))
+
+# New clustering with maximum contributer
+names(samsungData)[maxContrib]
+# [1] "fBodyAcc.meanFreq...Z"
+
+# K-means clustering (nstart=1, first try)
+kClust <- kmeans(sub1[, -c(562, 563)], centers = 6)
+table(kClust$cluster, sub1$Activity)
+
+  # LAYING SITTING STANDING WALKING WALKING_DOWNSTAIRS WALKING_UPSTAIRS
+  # 1     18       9        2       0                  0                0
+  # 3     29       0        0       0                  0                0
+  # 2      3       0        0       0                  0               53
+  # 4      0      33        1       0                  0                0
+  # 5      0       5       50       0                  0                0
+  # 6      0       0        0      95                 49                0
+
+
+# K-means clustering (nstart=1, second try)
+kClust <- kmeans(sub1[, -c(562, 563)], centers = 6, nstart = 1)
+table(kClust$cluster, sub1$Activity)
+
+# LAYING SITTING STANDING WALKING WALKING_DOWNSTAIRS WALKING_UPSTAIRS
+# 1     29       0        0       0                  0                0
+# 2      0      37       51       0                  0                0
+# 3      3       0        0       0                  0               53
+# 4      0       0        0      95                  0                0
+# 5     18      10        2       0                  0                0
+# 6      0       0        0       0                 49                0
+
+
+# K-means clustering (nstart=100, first try)
+kClust <- kmeans(sub1[, -c(562, 563)], centers = , nstart = 100)
+table(kClust$cluster, sub1$Activity)
+# LAYING SITTING STANDING WALKING WALKING_DOWNSTAIRS WALKING_UPSTAIRS
+# 1     29       0        0       0                  0                0
+# 2      0      37       51       0                  0                0
+# 3      3       0        0       0                  0               53
+# 4      0       0        0      95                  0                0
+# 5     18      10        2       0                  0                0
+# 6      0       0        0       0                 49                0
+
+
+#------------------------------------------------
+Question
+Why does the K-Means algorithm produce different clustering solutions every time you run it?
+
+Answers:
+K-Means chooses are random starting point by default. (This is the correct answer)
+
+
+The algorithm that K-Means uses to find the cluster centers uses stochastic simulation.
+
+
+K-Means assumes that the cluster centers are Normally distributed.
+
+Correct
+#------------------------------------------------
+
+
+# Cluster 1 Variable Centers (Laying)
+plot(kClust$center[1, 1:10], pch = 19, ylab = "Cluster Center", xlab = "")
+
+# Cluster 2 Variable Centers (Walking)
+plot(kClust$center[4, 1:10], pch = 19, ylab = "Cluster Center", xlab = "")
+
+
+
+#-------------------------------------
+#
+# AQS - Air Quality System
+#
+#-------------------------------------
+# check this url
+# https://aqs.epa.gov/aqsweb/airdata/download_files.html#Annual
+
+
+# ------------------------------------------
+# Question
+# Go to the web site for the EPA Air Quality System (AQS) data for downloading  and find the two files containing PM2.5 data for 1999 and 2012 that will be used in this video under PM2.5 "Local Conditions". What is the AQS parameter code (a 5-digit code) for PM2.5?
+# 81102
+# 42101
+# 42602
+# 88101 <-- correct
+# ------------------------------------------
+
+
+# ------------------------------------------
+#Question
+#Given what you've seen of the dataset, which function could be used to read the dataset into R?
+
+# textConnection()
+# read.table() <-- Correct
+# load()
+# readRDS()
+# ------------------------------------------
+
+
+# ------------------------------------------
+# Question
+# Given the dimensions of the 2012 dataset (1,304,287 rows and 28 columns) and assuming that all of the entries of the dataset are numeric, which of the following is an approximation of how much memory the data frame requires to store in R?
+
+# 34 MB
+# 144 Mb
+# 280 Mb  <-- Correct
+# 1.2 Gb
+# ------------------------------------------
+
+
+# ------------------------------------------
+# Question
+# Making the boxplot of the logged data produces the following warnings:
+
+# Warning messages:
+
+# 1: In boxplot.default(log10(x0), log10(x1)) : NaNs produced
+# 2: In bplt(at[i], wid = width[i], stats = z$stats[, i], out = z$out[z$group ==  :
+#  Outlier (-Inf) in boxplot 1 is not drawn
+# 3: In bplt(at[i], wid = width[i], stats = z$stats[, i], out = z$out[z$group ==  :
+
+#  Outlier (-Inf) in boxplot 2 is not drawn
+# Why are these warnings produced by R?
+# The data contain negative numbers and so the log function returns a NaN  value for those numbers.
+# The dataset is too large for the boxplot function to plot all the data.
+# The boxplot function cannot plot data on a log scale.
+
+#It is not appropriate to combine the log function and the boxplot function into a single function call.
+
+#Correct
+#There are two possible issues with the call to boxplot here. One is that the boxplot function generated the warning and the other is that the log function produced the warning.
+# ------------------------------------------
+
+
+# ------------------------------------------
+# Question
+# What does looking at the change in PM levels at a single monitor location allow us to control for that we could not control for when looking at the entire country?
+
+# We can control for possible changes in the monitoring locations between 1999 and 2012.  <-- correct
+# We can control for changes in the pollution sources between 1999 and 2012.
+# We can control for changes in the chemical composition of particulate matter between 1999 and 2012.
+# We can control for changes in global climate between 1999 and 2012.
+# ------------------------------------------
+
+
+
+# ------------------------------------------
+# Question
+#What does the code a %in% b produce, if a and b are both character vectors?
+
+# A logical vector of length equal to the length of a indicating which elements of a are in b.  <- Correct
+# A logical vector of length equal to the length of b indicating which elements of b are in a.
+# A character vector containing the elements of a that are in the vector b.
+# A character vector containing the elements of b that are in the vector a.
+# ------------------------------------------
+
+
+
+# ------------------------------------------
+# Question
+# Which argument to plot can be used to control the range of the y-axis so that both plots can be drawn with same range?
+
+# yaxt
+# pch
+# xlim
+# ylim  <-- correct
+# ------------------------------------------
+
+# ------------------------------------------
+# Question
+# Which function would be the most useful for trying to calculate the average value of PM by State for either 1999 or 2012?
+
+# matrix
+# tapply  <-- Correct
+# table
+# factor
+# ------------------------------------------
+

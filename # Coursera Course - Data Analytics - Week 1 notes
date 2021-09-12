@@ -1,0 +1,334 @@
+# Coursera Course - Data Analytics - Week 1 Notes
+# Based on the book 
+# Edward Tufte's book, Beautiful Evidence.
+
+###############################################################
+# Principes
+###############################################################
+
+
+1. - Show Comparisons - compared to what
+  - Evedence for a hypothesis is always relative to another competing hypothesis
+  - Alwayas ask @COmpared to What" (example air cleaner in home compared to no air clean in home - two boxplots)
+
+2. Show causality, mechanism , explanation, systematic structure
+  - What is your causal framework for thinking about the question
+    ( and another boxplot pair showing particulate* (PM2.5) matter with and without air cleaner)
+    this help to explain he initil boxplot findings where plot 1 symtom-free days high with air cleanrer compared to no air cleaner
+       and plot 2 PM2.5 decreased wigth ari clenaer compared to withiot.
+
+
+3. Show multivariate Data
+   - Multivariate = more than 2 variables
+   - The real world in multivariate
+   - Need to "escape flatland"
+
+   PM10 (outdoor) pollution we can use a scatterplot to show relationship between PM10 and mortality
+   but the plot is does not make a lot of sense (can show that mortality decreases with hight PM 10) "simsons paradox" so 
+   there is clearly other factors (season)
+   We can plot a multi-panel scatter plot where the data is split into the seasons and now
+   the PM10 relationship to mortality for each seacon make more sense (mortality rates increase with hight PM10)
+
+4. Integrate (multiple mode of) evidence
+    - Completly integrate words, numbers, images, diagrams
+    - Data graphics should make use of many modes of data presentstion
+    - Dont' let the tool drive the analysis
+    (Example in course showing nice diagram)
+
+5. Describe and Document the edivence with the appropiate labels, scales, sources, etc.
+    - A data graphic should tell a complete stores that this is credible
+
+
+6. (last) Content is king
+    - Analyticall presentations ultimately stand or fall dependongon the quality, relevance,
+     and iintegrity of their content.
+
+-------------------------
+##################################################################
+# Exploratory Graphs - (Part 1)  - see .R file Revision_Week_1.R
+#                                - see .R file Revision_Week_1.R
+##################################################################
+
+Exploratory Graphs
+- To undestand the data properties
+- To find patterns in data
+- To suggest modeling strategies
+- To "debug" analysis
+
+- To communicate results
+
+
+Characteristics of explorator graphics
+    - They are made quickly
+    - A large number are made
+    - The goal is for personal understanding
+    - Axes/legends are generally cleaned up (later)
+    - Color/size (Colour) are primarily used for information
+
+
+    Example below will use U.S. National Ambient Air Quality Standards
+    - For fine particle pollution (PM2.5) the "annual mean, averaged over 3 years"
+
+    Question: Are there any counties in the U.S. that exceed the national standard for fine 
+              particle pollution?
+
+------------------------------
+pollution <- read.csv("data/avgpm25.csv"
+                      , colClasses = c("numeric", "character", "factor", "numeric", "numeric"))
+head(pollution)
+
+options( digits = 3)
+
+summary(pollution$pm25)
+-----------------------------
+
+Do any counties exceed the standard of 12 ug/m3 ?
+
+summary(pollution$pm25)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   3.38    8.55   10.05    9.84   11.36   18.44 
+
+
+###############################################################
+# Exploratory Graphs - Part 2 - see .R file Revision_Week_1.R
+#                             - see .R file Revision_Week_1.R
+###############################################################
+
+Simple Summaries of Data
+
+Two Dimensions
+    - Multiple/overlayed 1-D (Lattice/ggplot2)
+    - Scatterplots
+    - Smooth Scatterplots
+
+> 2 Dimensions
+    - Overlayed/multiple 2-D plots; coplots
+    - Use color, size, shape to add Dimensions
+    - Spinngin plots
+    - Actual 3-D plots (not that useful)
+
+
+Summary
+    - Exploratory plots are "quick and dirty"
+    - let you summerize data (usually graphically) and highlight any broad features
+    - Explore basic questions and hypotheses (and perhaps ruule thenm out)
+    - Suggest modelling strategies for the "next step"
+
+Resources:
+    R Graph Gallery (https://www.r-graph-gallery.com/)
+    R Bloggers (https://www.r-bloggers.com/)
+
+
+
+####################################
+# 3 Code Plotting systems
+#   - Based Plotting system ("artist's palette" model)
+#   - Lattice Plotting system (Entire plot is specificed by on function call; conditioning)
+#   - GGPlot2 Plotting system (mixes elements from base and Lattice)
+#
+# - Lattice and GGPlot notes are in week 2, here 
+# -  we will just look at the Base Plotting system
+#
+#  - see .R file Revision_Week_1.R
+#
+####################################
+
+The Base Plotting system
+    - "Artists's palette" model
+    - Start with blank canvas and build up from there
+    - Start with plot function (or similar)
+    - Use annotation functions to add/modift (text, lines, points, axis) 
+
+
+Pros/Cons:
+    - Convenient, mirrorw how we think of building plots and analyzing data
+    - Difficult to "translate" to others once a new plot has been created (no graphical "language")
+    - Plot is just a series of R commands
+
+
+Some Important Base Graphics Parameters
+    - pch   Plot Character
+    - lty   Line Type
+    - lwd   Line Width
+    - col   Colour - run colors() to see list
+    - xlab  Label for the X axis
+    - ylab  Label for the X axis
+
+    - par() specify global graphics Parameters
+      - las: the orientation of the axis labels on the plot
+      - bg: the background Colour
+      - mar: margin size
+      - oma:  the outer margin size (default is 0 for all sides)
+      - mfrow: nmber of plots per row, column (plots are filled row-wise)
+      - mfcol: number of plots per row, column (plots are filled column-wise)
+
+      to get defalts, call par("with option")
+      
+      examples:
+        par("pb")
+        ## [1] "transparent"
+
+        par("mar")
+        ## [1] 5.1, 4.1, 4.1, 2.1  -- (bottom, left, top, right)
+
+        par("mfrow")
+        ## [1] (1,1))
+
+example of a plot
+with (airquality, plot(Ozone, Wind, col="turquoise"))
+
+
+
+###############################
+#
+# Base Plotting system (Part 2)
+#
+###############################
+
+Plotting functions
+- plot
+
+- lines   add lines to a plot, given a vector x values and a corresponding vector
+        of y values (or a 2-column matric); this function just connects the dots
+
+- points  add points to a plot
+
+- text   add text labels to a plot using specified x, y coordinates
+
+- title  add annotations to x, y axis labels, title, subtitle, outer margin
+
+- mtext  add arbitrary text to the margins (inner or outer) of the plot
+
+- axis  adding axis ticks/lables
+
+
+
+
+# example 1 - plot and adding a title
+library(datasets)
+with(airquality, plot(Wind, Ozone))
+title(main = "OZome and Wind in New Your City") # Add a title
+
+# example 1a - combine both line abive
+with(airquality, plot(Wind, Ozone, main = "OZome and Wind in New Your City"))
+
+# example 1b - plot as before abd now replot just for a single Month and add colour blue
+with(airquality, plot(Wind, Ozone, main = "OZome and Wind in New Your City"))
+with(subset(airquality, Month == 5), points(Wind, Ozone, col = "blue"))
+
+
+# ** VERY USEFUL ***
+# Initial a plot without drawing it (type = "n"), then add the featutes
+with(airquality, plot(Wind, Ozone, main = "OZome and Wind in New Your City"
+  ,type = "n"))
+with(subset(airquality, Month == 5), points(Wind, Ozone, col = "blue"))
+with(subset(airquality, Month != 5), points(Wind, Ozone, col = "red"))
+legend("topright", pch = 1, col = c("blue", "red"), legend = c("May", "Other Months"))
+
+
+# Base Plot with Regression Line
+with(airquality, plot(Wind, Ozone, main = "OZome and Wind in New Your City", pch = 20))
+model <- lm(Ozone ~ Wind, airquality)
+abline(model, lwd = 2, col = "red")
+
+
+
+###########################
+##
+## Multiple Plots
+##
+##########################
+
+# example 1
+par(mfrow=c(1,2))
+with(airquality, {
+  plot(Wind, Ozone, main = "Ozone and Wind")
+  plot(Solar.R, Ozone, main = "Ozone and Solar Radiation")
+})
+
+# example 1a - and adding  (global using mtext) title over all lanels
+
+#   note: par: mar - reduce defaults slightly, oma usyally default to (0,0,0,0) so increase to allow for title
+
+par(mfrow=c(1, 3), mar = c(4, 4, 2, 1), oma = c(0, 0, 2, 0))
+with(airquality, {
+  plot(Wind, Ozone, main = "Ozone and Wind")
+  plot(Solar.R, Ozone, main = "Ozone and Solar Radiation")
+  plot(Temp, Ozone, main = "Ozone and Temporature")
+  mtext("Ozone and Weather in New York City", outer = TRUE)
+})
+
+
+###########
+# Summary:
+###########
+
+- Plots are created by calling successive R functions to "build up" a plot
+
+- Plotting occurs in two stage:
+    
+    - Creation of a plot
+
+    - Annotation of a plot (adding lines, points, text, legends)
+
+- The base plotting system is very flexible and offers a high degree of control 
+    over plotting.
+
+
+
+###############################
+#
+# Base Plotting system (Demonstration)
+#
+###############################
+
+# simple plot to the screen
+library(datasets)
+with(faithful, plot(eruptions, waiting))
+title(main = "Old Faithful Geyser data")
+
+# another method is to plot to a device
+
+Steps:
+
+- Explicitly launch a graphics device
+
+- Call a plotting function to make a plot (Note: if you are using a file device,
+   no plot will appear on the screen)
+
+- Annotate plot if necessary
+
+- Explicitly close graphics device eith dev.close() (this is very important)
+
+# example:
+pdf(file = "myplot.pdf") # Open PDF device: create 'myplot.pdf' in my working directy
+
+## Create plot and send to a file (no plot appears on screen)
+with(faithful, plot(eruptions, waiting))
+title(main = "Old Faithful Geyser data")
+dev.off() ## Close the PDF file device
+## Now you can view the file 'myplot.pdf on your computer
+
+
+# dev.cur() while pdf device is open will return pdf  4
+# after dec.close() dev.cur() will return GD or RStudioGD
+
+# if you have multiple deviced open you can switch between them using 
+# dev.set(<integer of device>)
+
+
+######################################
+# Copy screen device to another device
+######################################
+
+dev.copy() # copy to anotehr device
+and
+dev.copy2pdf() # copy specifically to a pdf devive
+
+Note: copy a plot is not an exact operation so the result may look a little different.
+
+library(datasets)
+with(faithful, plot(eruptions, waiting)) ## Create a plot on the screen device
+title(main = "Old Faithful Geyser data") ## add a main title
+dev.copy(png, file="geyserplot.png") ## Copy plot to a PNF file
+dev.off() ## important - close the PNG device!
